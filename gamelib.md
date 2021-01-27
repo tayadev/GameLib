@@ -20,6 +20,8 @@
 - id: String			unique id of tha game, single word, all lowercase, used in commands
 - name: String			name of the game used in messages, can contain formatting and colors
 - arenas: List<Arena>	list of arenas this game can use
+- status
+- settings
 ```
 
 ## Arena
@@ -63,3 +65,12 @@ extend Spawnpoint
 - game: Game
 - type: GamePlayerType
 ```
+
+
+NEXTUP:
+
+commands
+config
+utils
+    world handling
+all the other stuff

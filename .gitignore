@@ -3,4 +3,5 @@
 target
 .classpath
 .project
-gamelib
+gamelib.md
+test
