@@ -1,7 +1,9 @@
 .settings
 .vscode
-target
 .classpath
 .project
 gamelib.md
 test
+.gradle
+build
+bin

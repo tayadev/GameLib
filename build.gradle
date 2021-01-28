@@ -1,0 +1,42 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '6.0.0'
+}
+
+repositories {
+  mavenCentral() // This is needed for dependencies.
+   /*
+   As Spigot-API depends on the Bungeecord ChatComponent-API,
+  we need to add the Sonatype OSS repository, as Gradle,
+  in comparison to maven, doesn't want to understand the ~/.m2
+  directory unless added using mavenLocal(). Maven usually just gets
+  it from there, as most people have run the BuildTools at least once.
+  This is therefore not needed if you're using the full Spigot/CraftBukkit,
+  or if you're using the Bukkit API.
+  */
+  maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
+  maven { url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
+  // mavenLocal() // This is needed for CraftBukkit and Spigot.
+
+  // CommandAPI
+   maven { url = "https://raw.githubusercontent.com/JorelAli/CommandAPI/mvn-repo/" }
+   maven { url = "https://repo.codemc.org/repository/maven-public/" }
+}
+
+dependencies {
+  // Pick only one of these and read the comment in the repositories block.
+  compileOnly 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT' // The Spigot API with no shadowing. Requires the OSS repo.
+//   compileOnly 'org.bukkit:bukkit:1.12.2-R0.1-SNAPSHOT' // The Bukkit API with no shadowing.
+//   compileOnly 'org.spigotmc:spigot:1.12.2.-R0.1-SNAPSHOT' // The full Spigot server with no shadowing. Requires mavenLocal.
+//   compileOnly 'org.bukkit:craftbukkit:1.12.2-R0.1-SNAPSHOT' // The full CraftBukkit server with no shadowing. Requires mavenLocal.
+
+  // CommandAPI
+  compileOnly "dev.jorel:commandapi-core:5.8"
+  compile "dev.jorel:commandapi-shade:5.8"
+}
+
+shadowJar {
+    dependencies {
+        include dependency("dev.jorel:commandapi-shade:5.8")
+    }
+}
