@@ -2,19 +2,14 @@ package one.taya.gamelib.game;
 
 import org.bukkit.Location;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class Spawnpoint {
     
-    private Location location;
+    @Getter @Setter private Location location;
 
     public Spawnpoint(Location location) {
-        this.location = location;
-    }
-
-    public Location getLocation() {
-        return location;
-    }
-
-    public void setLocation(Location location) {
         this.location = location;
     }
 
