@@ -1,5 +1,9 @@
 package one.taya.gamelib.game;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import lombok.Getter;
 import lombok.Setter;
 import one.taya.gamelib.enums.GameStatus;
@@ -13,7 +17,7 @@ public class Game {
     @Getter @Setter private GameStatus status;
     @Getter private GameSettings settings;
 
-    //private Set<GameArena> arenas = new HashSet<GameArena>();
+    @Getter private Set<GameArena> arenas = new HashSet<GameArena>();
 
     public Game(String id) {
 
@@ -24,6 +28,14 @@ public class Game {
 
         this.status = GameStatus.WAITING;
         //this.settings = GameSettings.default;
+    }
+
+    public void addArena(GameArena arena) {
+        arenas.add(arena);
+    }
+
+    public void addArenas(Collection<GameArena> arenas) {
+        this.arenas.addAll(arenas);
     }
 
 }

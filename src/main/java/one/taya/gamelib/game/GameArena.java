@@ -1,15 +1,19 @@
 package one.taya.gamelib.game;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
+import org.bukkit.entity.Player;
 
 import lombok.Getter;
 import lombok.Setter;
 import one.taya.gamelib.GameLib;
+import one.taya.gamelib.GameManager;
 import one.taya.gamelib.utils.IdUtil;
 
 public class GameArena {
@@ -50,7 +54,7 @@ public class GameArena {
      * Saves the currently loaded world to the default worlds folder
      */
     public void saveDefaultWorld() {
-        GameLib.logDebug("Saving default world for Arena %s".formatted(id), GameLib.getPlugin()); //FIXME:
-    }
 
+        // Delete current default if it exists and copy world over to defaults folder
+    }
 }
