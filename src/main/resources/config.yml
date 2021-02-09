@@ -1,0 +1,36 @@
+Teams:
+  - id: black
+    name: &0Black Bears
+    players:
+      - TayaMc
+      - ArsonElu
+      - tree37
+      - L3xu_
+  - id: red
+    name: &cRed Reindeers
+    players:
+      - le_chriesi
+  - id: green
+    name: &aGreen Goats
+    players:
+  - id: purple
+    name: &5Purple Pandas
+    players:
+  - id: white
+    name: &fWhite Wales
+    players:
+  - id: pink
+    name: &dPink Piggies
+    players:
+  - id: blue
+    name: &1Blue Badgers
+    players:
+  - id: cyan
+    name: &3Cyan Carps
+    players:
+  - id: yellow
+    name: &eYellow Yaks
+    players:
+  - id: orange
+    name: &6Orange Owls
+    players:

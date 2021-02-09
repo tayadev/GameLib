@@ -19,6 +19,7 @@ repositories {
 dependencies {
   // Spigot
   compileOnly 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'
+  testCompile 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'
 
   // Lombok
   compileOnly 'org.projectlombok:lombok:1.18.16'
