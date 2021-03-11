@@ -1,5 +1,7 @@
 package one.taya.gamelib.game;
 
+import java.util.Optional;
+
 import org.bukkit.WeatherType;
 
 import lombok.Getter;
@@ -14,7 +16,7 @@ public class ArenaSettings extends AreaSettings {
 
     public ArenaSettings() {
         super();
-        priority = 500;
+        priority = Optional.of(500);
 
         daylightCycle = true;
         time = 1000; // same as /time set day

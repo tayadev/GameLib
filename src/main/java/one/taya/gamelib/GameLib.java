@@ -67,4 +67,9 @@ public class GameLib extends JavaPlugin {
         if(debug) System.out.println("[GameLib]" + " [" + plugin.getName() + "]" + " [DEBUG] " + message);
 	}
 
+	public static void addGame(Game game) {
+		games.add(game);
+		logDebug("Registered game " + game.getName(), getPlugin());
+	}
+
 }

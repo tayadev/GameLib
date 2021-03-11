@@ -22,7 +22,7 @@ public class Area implements ConfigurationSerializable {
 
     public Area(String id, Set<Section> sections, boolean settingsEnabled, AreaSettings settings) {
         
-        if(IdUtil.isValid(id)) throw new IllegalArgumentException("Invalid id");
+        if(!IdUtil.isValid(id)) throw new IllegalArgumentException("Invalid id");
 
         this.id = id;
         this.sections = sections;

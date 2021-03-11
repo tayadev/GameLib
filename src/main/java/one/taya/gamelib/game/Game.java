@@ -11,6 +11,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 import lombok.Getter;
 import lombok.Setter;
+import one.taya.gamelib.GameLib;
 import one.taya.gamelib.enums.GameStatus;
 import one.taya.gamelib.utils.IdUtil;
 
@@ -33,6 +34,9 @@ public class Game implements ConfigurationSerializable {
         this.arenas = arenas;
 
         this.status = GameStatus.WAITING;
+
+        // Register game
+        GameLib.addGame(this);
     }
 
     @Override

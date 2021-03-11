@@ -1,11 +1,9 @@
 package one.taya.gamelib.game;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Optional;
 
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -41,7 +39,7 @@ public class GameSettings extends ArenaSettings {
     
     public GameSettings() {
         super();
-        priority = 1000;
+        priority = Optional.of(1000);
 
         teamWin = false;
         teamDisqualification = false;

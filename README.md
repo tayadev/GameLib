@@ -69,6 +69,8 @@ extend Spawnpoint
 
 NEXTUP:
 
+=> Add commands to change settings, a command to save/load config & implement settings
+
 commands
 config
 utils

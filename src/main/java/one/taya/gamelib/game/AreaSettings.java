@@ -8,7 +8,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 public class AreaSettings implements ConfigurationSerializable {
 
-    private Optional<Integer> priority;
+    protected Optional<Integer> priority;
     private Optional<Boolean> pvp;
     private Optional<Boolean> health;
     private Optional<Boolean> food;

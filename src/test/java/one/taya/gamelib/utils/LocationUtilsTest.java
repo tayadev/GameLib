@@ -13,7 +13,7 @@ public class LocationUtilsTest {
     @Test
     void isInSection() {
 
-        Section section = new Section(new Location(null, 0, 0, 0), new Location(null, 10, 10, 10));
+        Section section = new Section("test", new Location(null, 0, 0, 0), new Location(null, 10, 10, 10));
         Location inside = new Location(null, 5, 5, 5);
         Location outside = new Location(null, 15, 5, 5);
 
@@ -24,10 +24,10 @@ public class LocationUtilsTest {
     @Test
     void isInArea() {
 
-        Section section1 = new Section(new Location(null, 0, 0, 0), new Location(null, 10, 10, 10));
-        Section section2 = new Section(new Location(null, 10, 0, 0), new Location(null, 15, 5, 5));
+        Section section1 = new Section("test", new Location(null, 0, 0, 0), new Location(null, 10, 10, 10));
+        Section section2 = new Section("test", new Location(null, 10, 0, 0), new Location(null, 15, 5, 5));
 
-        Area area = new Area("testArea");
+        Area area = new Area("testarea");
         area.addSection(section1);
         area.addSection(section2);
 
