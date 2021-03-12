@@ -70,9 +70,14 @@ extend Spawnpoint
 NEXTUP:
 
 => Add commands to change settings, a command to save/load config & implement settings
-
-commands
-config
-utils
-    world handling
-all the other stuff
+=> Command permissions
+=> World handling (loading worlds, saving worlds, resetting worlds, teleporting between worlds)
+=> gameflow
+    -> joining & rejoining (tp to spawnpoint)
+    -> event handling
+=> scores and stats
+=> name prefixes & colors
+=> modules
+    -> loot chests
+    -> cinematics
+=> create minigames

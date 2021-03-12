@@ -11,28 +11,31 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 import lombok.Getter;
 import lombok.Setter;
+import one.taya.gamelib.enums.AreaFlag;
 import one.taya.gamelib.utils.IdUtil;
 
 public class Area implements ConfigurationSerializable {
     
     @Getter private String id;
     @Getter private Set<Section> sections = new HashSet<Section>();
-    @Getter @Setter private boolean settingsEnabled = false;
-    @Getter private AreaSettings settings;
+    @Getter @Setter private boolean settingsEnabled;
+    @Getter @Setter private int priority;
+    @Getter @Setter private Set<AreaFlag> flags = new HashSet<AreaFlag>();
 
-    public Area(String id, Set<Section> sections, boolean settingsEnabled, AreaSettings settings) {
+    public Area(String id, Set<Section> sections, boolean settingsEnabled, int priority, Set<AreaFlag> flags) {
         
         if(!IdUtil.isValid(id)) throw new IllegalArgumentException("Invalid id");
 
         this.id = id;
         this.sections = sections;
         this.settingsEnabled = settingsEnabled;
-        this.settings = settings;
+        this.priority = priority;
+        this.flags = flags;
 
     }
 
     public Area(String id) {
-        this(id, new HashSet<Section>(), false, new AreaSettings());
+        this(id, new HashSet<Section>(), false, 0, new HashSet<AreaFlag>());
     }
 
     public void addSection(Section section) {
@@ -45,7 +48,8 @@ public class Area implements ConfigurationSerializable {
         map.put("id", id);
         map.put("sections", sections.stream().map(Section::serialize).collect(Collectors.toSet()));
         map.put("settingsEnabled", settingsEnabled);
-        map.put("settings", settings);
+        map.put("priority", priority);
+        map.put("flags", flags.stream().map(Enum::toString).collect(Collectors.toSet()));
         return map;
     }
 
@@ -54,7 +58,8 @@ public class Area implements ConfigurationSerializable {
             (String) serialized.get("id"),
             Stream.of(serialized.get("sections")).map(Map.class::cast).map(s -> Section.deserialize(s)).collect(Collectors.toSet()),
             (boolean) serialized.get("settingsEnabled"),
-            (AreaSettings) serialized.get("settings")
+            (int) serialized.get("priority"),
+            Stream.of(serialized.get("flags")).map(String.class::cast).map(f -> AreaFlag.valueOf(f)).collect(Collectors.toSet())
             );
     }
 

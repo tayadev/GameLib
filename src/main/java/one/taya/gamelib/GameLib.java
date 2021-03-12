@@ -9,8 +9,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import dev.jorel.commandapi.CommandAPI;
 import lombok.Getter;
+import lombok.Setter;
 import net.md_5.bungee.api.ChatColor;
 import one.taya.gamelib.commands.GameLibCommand;
+import one.taya.gamelib.game.Arena;
 import one.taya.gamelib.game.Game;
 import one.taya.gamelib.game.GamePlayer;
 import one.taya.gamelib.listeners.PlayerJoinListener;
@@ -30,6 +32,8 @@ public class GameLib extends JavaPlugin {
 	@Getter private static Set<GamePlayer> players = new HashSet<GamePlayer>();
 	
 	@Getter private static String chatPrefix = "[" + ChatColor.DARK_PURPLE + "GameLib" + ChatColor.RESET + "] ";
+
+    @Getter @Setter private static Game currentGame;
 
 	@Override
     public void onLoad() {

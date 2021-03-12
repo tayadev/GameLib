@@ -7,11 +7,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.bukkit.Difficulty;
+import org.bukkit.GameMode;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 import lombok.Getter;
 import lombok.Setter;
 import one.taya.gamelib.GameLib;
+import one.taya.gamelib.enums.GameFlag;
 import one.taya.gamelib.enums.GameStatus;
 import one.taya.gamelib.utils.IdUtil;
 
@@ -21,16 +24,29 @@ public class Game implements ConfigurationSerializable {
     @Getter @Setter private String name;
 
     @Getter @Setter private GameStatus status;
-    @Getter private GameSettings settings;
+
+    @Getter @Setter private int healthLevel;
+    @Getter @Setter private int foodLevel;
+    @Getter @Setter private GameMode gameMode;
+    @Getter @Setter private Difficulty difficulty;
+
+    @Getter @Setter private Set<GameFlag> flags = new HashSet<GameFlag>();
 
     @Getter private Set<Arena> arenas = new HashSet<Arena>();
 
-    public Game(String id, String name, GameSettings settings, Set<Arena> arenas) {
+    public Game(String id, String name, int healthLevel, int foodLevel, GameMode gameMode, Difficulty difficulty, Set<GameFlag> flags, Set<Arena> arenas) {
         if (!IdUtil.isValid(id)) throw new IllegalArgumentException("Invalid id");
 
         this.id = id;
         this.name = name;
-        this.settings = settings;
+
+        this.healthLevel = healthLevel;
+        this.foodLevel = foodLevel;
+        this.gameMode = gameMode;
+        this.difficulty = difficulty;
+
+        this.flags = flags;
+
         this.arenas = arenas;
 
         this.status = GameStatus.WAITING;
@@ -44,7 +60,11 @@ public class Game implements ConfigurationSerializable {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("id", id);
         map.put("name", name);
-        map.put("settings", settings);
+        map.put("healthLevel", healthLevel);
+        map.put("foodLevel", foodLevel);
+        map.put("gameMode", gameMode);
+        map.put("difficulty", difficulty);
+        map.put("flags", flags.stream().map(Enum::toString).collect(Collectors.toSet()));
         map.put("arenas", arenas.stream().map(Arena::serialize).collect(Collectors.toSet()));
         return map;
     }
@@ -53,7 +73,11 @@ public class Game implements ConfigurationSerializable {
         return new Game(
             (String) serialized.get("id"),
             (String) serialized.get("name"),
-            (GameSettings) serialized.get("settings"),
+            (int) serialized.get("healthLevel"),
+            (int) serialized.get("foodLevel"),
+            (GameMode) serialized.get("gameMode"),
+            (Difficulty) serialized.get("difficulty"),
+            Stream.of(serialized.get("flags")).map(String.class::cast).map(f -> GameFlag.valueOf(f)).collect(Collectors.toSet()),
             Stream.of(serialized.get("arenas")).map(Map.class::cast).map(s -> Arena.deserialize(s)).collect(Collectors.toSet())
         );
     }
