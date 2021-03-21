@@ -19,6 +19,8 @@ public class PlayerJoinListener implements Listener {
 
         // handle join message
         event.setJoinMessage(ChatColor.WHITE + "[" + ChatColor.GREEN + "+" +  ChatColor.WHITE + "] " + bukkitPlayer.getDisplayName());
+
+        //TODO: spawn player in correct world depending on current game
     }
 
 }

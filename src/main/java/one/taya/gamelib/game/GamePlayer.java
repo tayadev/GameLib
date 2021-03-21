@@ -15,8 +15,6 @@ public class GamePlayer implements ConfigurationSerializable {
     @Getter @Setter private OfflinePlayer player;
     @Getter @Setter private Team team;
     @Getter @Setter private GamePlayerType type;
-    @Getter @Setter private Game game;
-    @Getter @Setter private Arena arena;
 
     public GamePlayer(OfflinePlayer player, Team team, GamePlayerType type) {
         this.player = player;

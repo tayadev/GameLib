@@ -25,14 +25,14 @@ public class Section implements ConfigurationSerializable {
         this.id = id;
 
         this.corner1 = new Location(
-            corner1.getWorld(),
+            null,
             Math.min(corner1.getX(), corner2.getX()),
             Math.min(corner1.getY(), corner2.getY()),
             Math.min(corner1.getZ(), corner2.getZ())
         );
 
         this.corner2 = new Location(
-            corner1.getWorld(),
+            null,
             Math.max(corner1.getX(), corner2.getX()),
             Math.max(corner1.getY(), corner2.getY()),
             Math.max(corner1.getZ(), corner2.getZ())
@@ -46,7 +46,7 @@ public class Section implements ConfigurationSerializable {
             @Override
             public void run() {
                 if(counter != 0) {
-                    ParticleUtil.drawBox(section.corner1, section.corner2, 0.1, player);
+                    ParticleUtil.drawBox(section.corner1, section.corner2, 0.5, player);
                     counter--;
                 } else {
                     this.cancel();

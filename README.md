@@ -69,9 +69,13 @@ extend Spawnpoint
 
 NEXTUP:
 
+!? Lets hope it was the right decision to remove the game field form gameplayer and just use the global gamelib.getcurrentgame instead
+
 => Add commands to change settings, a command to save/load config & implement settings
+ => Add (de)serialisation to some bukkit types that don't yet support it
+ => test event handling
 => Command permissions
-=> World handling (loading worlds, saving worlds, resetting worlds, teleporting between worlds)
+=> World handling (resetting worlds)
 => gameflow
     -> joining & rejoining (tp to spawnpoint)
     -> event handling

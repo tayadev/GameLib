@@ -16,12 +16,15 @@ import dev.jorel.commandapi.arguments.CustomArgument.MessageBuilder;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
 import net.md_5.bungee.api.ChatColor;
 import one.taya.gamelib.GameLib;
+import one.taya.gamelib.enums.AreaFlag;
+import one.taya.gamelib.enums.GameFlag;
 import one.taya.gamelib.enums.GamePlayerType;
 import one.taya.gamelib.game.Area;
 import one.taya.gamelib.game.Arena;
 import one.taya.gamelib.game.Game;
 import one.taya.gamelib.game.GamePlayer;
 import one.taya.gamelib.game.Section;
+import one.taya.gamelib.managers.GameManager;
 
 public class GameLibCommand {
     
@@ -64,11 +67,10 @@ public class GameLibCommand {
                     GamePlayer gamePlayer = (GamePlayer) args[0];
                     OfflinePlayer player = gamePlayer.getPlayer();
                     sender.sendMessage(new String[] {
-                        GameLib.getChatPrefix() + "Info for player: " + ChatColor.AQUA + player.getName(),
-                        GameLib.getChatPrefix() + "Online: " + (player.isOnline() ? TRUE : FALSE),
-                        GameLib.getChatPrefix() + "Type: " + (gamePlayer.getType() != null ? gamePlayer.getType() : NONE),
-                        GameLib.getChatPrefix() + "Team: " + (gamePlayer.getTeam() != null ? gamePlayer.getTeam().getName() + ChatColor.GRAY + "(" + gamePlayer.getTeam().getId() + ")" : NONE),
-                        GameLib.getChatPrefix() + "Game: " + (gamePlayer.getGame() != null ? gamePlayer.getGame().getName() + ChatColor.GRAY + "(" + gamePlayer.getGame().getId() + ")" : NONE)
+                        GameLib.getChatPrefix() + ChatColor.GRAY + "Info for player: " + ChatColor.RESET + ChatColor.AQUA + player.getName(),
+                        GameLib.getChatPrefix() + ChatColor.GRAY + "Online: " + ChatColor.RESET + (player.isOnline() ? TRUE : FALSE),
+                        GameLib.getChatPrefix() + ChatColor.GRAY + "Type: " + ChatColor.RESET + (gamePlayer.getType() != null ? gamePlayer.getType() : NONE),
+                        GameLib.getChatPrefix() + ChatColor.GRAY + "Team: " + ChatColor.RESET + (gamePlayer.getTeam() != null ? gamePlayer.getTeam().getName() + ChatColor.GRAY + "(" + gamePlayer.getTeam().getId() + ")" : NONE),
                     });
                 })
             )
@@ -98,9 +100,52 @@ public class GameLibCommand {
                 .executes((sender, args) -> {
                     Game game = (Game) args[0];
                     sender.sendMessage(new String[] {
-                        GameLib.getChatPrefix() + "Info for game: " + game.getName(),
-                        GameLib.getChatPrefix() + "Status: " + (game.getStatus() != null ? game.getStatus() : NONE)
+                        GameLib.getChatPrefix() + ChatColor.GRAY + "Info for game: " + ChatColor.RESET + game.getName(),
+                        GameLib.getChatPrefix() + ChatColor.GRAY + "Status: " + ChatColor.RESET + (game.getStatus() != null ? game.getStatus() : NONE),
+                        GameLib.getChatPrefix() + ChatColor.GRAY + "Flags: " + ChatColor.RESET + game.getFlags().stream().map(GameFlag::name).collect(Collectors.joining(", "))
                     });
+                })
+            )
+            .withSubcommand(new CommandAPICommand("set")
+                .withSubcommand(new CommandAPICommand("flags")
+                    .withSubcommand(new CommandAPICommand("add")
+                        .withArguments(gameArgument("game"))
+                        .withArguments(gameFlagArgument("gameFlag"))
+                        .executes((sender, args) -> {
+                            Game game = (Game) args[0];
+                            GameFlag flag = (GameFlag) args[1];
+                            game.getFlags().add(flag);
+                            sender.sendMessage(GameLib.getChatPrefix() + ChatColor.GREEN + "Added " + flag.name());
+                        })
+                    )
+                    .withSubcommand(new CommandAPICommand("remove")
+                        .withArguments(gameArgument("game"))
+                        .withArguments(gameFlagArgument("gameFlag"))
+                        .executes((sender, args) -> {
+                            Game game = (Game) args[0];
+                            GameFlag flag = (GameFlag) args[1];
+                            game.getFlags().remove(flag);
+                            sender.sendMessage(GameLib.getChatPrefix() + ChatColor.GREEN + "Removed " + flag.name());
+                        })
+                    )
+                )
+            )
+            .withSubcommand(new CommandAPICommand("save")
+                .withArguments(gameArgument("game"))
+                .executes((sender, args) -> {
+                    Game game = (Game) args[0];
+                    game.getPlugin().getConfig().set("game", game);
+                    game.getPlugin().saveConfig();
+                    sender.sendMessage(GameLib.getChatPrefix() + "Saved " + game.getName() + ChatColor.RESET + " to the config");
+                })
+            )
+            .withSubcommand(new CommandAPICommand("load")
+                .withArguments(gameArgument("game"))
+                .executes((sender, args) -> {
+                    Game game = (Game) args[0];
+                    Game loadedGame = (Game) game.getPlugin().getConfig().get("game");
+                    game = loadedGame;
+                    sender.sendMessage(GameLib.getChatPrefix() + "Loaded " + game.getName()  + ChatColor.RESET + " from the config");
                 })
             )
         )
@@ -109,7 +154,7 @@ public class GameLibCommand {
                 .withArguments(gameArgument("game"))
                 .executes((sender, args) -> {
                     Game game = (Game) args[0];
-                    sender.sendMessage(GameLib.getChatPrefix() + "Arenas for " + game.getName() + ": " + game.getArenas().stream().map(Arena::getId).collect(Collectors.joining(", ")));
+                    sender.sendMessage(GameLib.getChatPrefix() + "Arenas for " + game.getName() + ChatColor.RESET + ": " + game.getArenas().stream().map(Arena::getId).collect(Collectors.joining(", ")));
                 })
             )
             .withSubcommand(new CommandAPICommand("get")
@@ -117,9 +162,34 @@ public class GameLibCommand {
                 .executes((sender, args) -> {
                     Arena arena = (Arena) args[0];
                     sender.sendMessage(new String[] {
-                        GameLib.getChatPrefix() + "Info for arena: " + arena.getName()
+                        GameLib.getChatPrefix() + ChatColor.GRAY + "Info for arena: " + ChatColor.RESET + arena.getName(),
+                        GameLib.getChatPrefix() + ChatColor.GRAY + "Flags: " + ChatColor.RESET + arena.getFlags().stream().map(AreaFlag::name).collect(Collectors.joining(", "))
                     });
                 })
+            )
+            .withSubcommand(new CommandAPICommand("set")
+                .withSubcommand(new CommandAPICommand("flags")
+                    .withSubcommand(new CommandAPICommand("add")
+                        .withArguments(arenaArgument("arena"))
+                        .withArguments(areaFlagArgument("areaFlag"))
+                        .executes((sender, args) -> {
+                            Arena arena = (Arena) args[0];
+                            AreaFlag flag = (AreaFlag) args[1];
+                            arena.getFlags().add(flag);
+                            sender.sendMessage(GameLib.getChatPrefix() + ChatColor.GREEN + "Added " + flag.name());
+                        })
+                    )
+                    .withSubcommand(new CommandAPICommand("remove")
+                        .withArguments(arenaArgument("arena"))
+                        .withArguments(areaFlagArgument("areaFlag"))
+                        .executes((sender, args) -> {
+                            Arena arena = (Arena) args[0];
+                            AreaFlag flag = (AreaFlag) args[1];
+                            arena.getFlags().remove(flag);
+                            sender.sendMessage(GameLib.getChatPrefix() + ChatColor.GREEN + "Removed " + flag.name());
+                        })
+                    )
+                )
             )
         )
         .withSubcommand(new CommandAPICommand("areas")
@@ -127,7 +197,7 @@ public class GameLibCommand {
                 .withArguments(arenaArgument("arena"))
                 .executes((sender, args) -> {
                     Arena arena = (Arena) args[0];
-                    sender.sendMessage(GameLib.getChatPrefix() + "Areas for " + arena.getName() + ": " + arena.getAreas().stream().map(Area::getId).collect(Collectors.joining(", ")));
+                    sender.sendMessage(GameLib.getChatPrefix() + "Areas for " + arena.getName() + ChatColor.RESET + ": " + arena.getAreas().stream().map(Area::getId).collect(Collectors.joining(", ")));
                 })
             )
             .withSubcommand(new CommandAPICommand("get")
@@ -135,9 +205,34 @@ public class GameLibCommand {
                 .executes((sender, args) -> {
                     Area area = (Area) args[0];
                     sender.sendMessage(new String[] {
-                        GameLib.getChatPrefix() + "Info for area: " + area.getId()
+                        GameLib.getChatPrefix() + ChatColor.GRAY + "Info for area: " + ChatColor.RESET + area.getId(),
+                        GameLib.getChatPrefix() + ChatColor.GRAY + "Flags: " + ChatColor.RESET + area.getFlags().stream().map(AreaFlag::name).collect(Collectors.joining(", "))
                     });
                 })
+            )
+            .withSubcommand(new CommandAPICommand("set")
+                .withSubcommand(new CommandAPICommand("flags")
+                    .withSubcommand(new CommandAPICommand("add")
+                        .withArguments(areaArgument("area"))
+                        .withArguments(areaFlagArgument("areaFlag"))
+                        .executes((sender, args) -> {
+                            Area area = (Area) args[0];
+                            AreaFlag flag = (AreaFlag) args[1];
+                            area.getFlags().add(flag);
+                            sender.sendMessage(GameLib.getChatPrefix() + ChatColor.GREEN + "Added " + flag.name());
+                        })
+                    )
+                    .withSubcommand(new CommandAPICommand("remove")
+                        .withArguments(areaArgument("area"))
+                        .withArguments(areaFlagArgument("areaFlag"))
+                        .executes((sender, args) -> {
+                            Area area = (Area) args[0];
+                            AreaFlag flag = (AreaFlag) args[1];
+                            area.getFlags().remove(flag);
+                            sender.sendMessage(GameLib.getChatPrefix() + ChatColor.GREEN + "Removed " + flag.name());
+                        })
+                    )
+                )
             )
         )
         .withSubcommand(new CommandAPICommand("sections")
@@ -153,7 +248,8 @@ public class GameLibCommand {
                 .executes((sender, args) -> {
                     Section section = (Section) args[0];
                     sender.sendMessage(new String[] {
-                        GameLib.getChatPrefix() + "Info for section: " + section.getId()
+                        GameLib.getChatPrefix() + ChatColor.GRAY + "Info for section: " + ChatColor.RESET + section.getId(),
+                        GameLib.getChatPrefix() + ChatColor.GRAY + "Corners: " + ChatColor.RESET + "[" + section.getCorner1().getX() + ", " + section.getCorner1().getY() + ", " + section.getCorner1().getZ() + "] [" + section.getCorner2().getX() + ", " + section.getCorner2().getY() + ", " + section.getCorner2().getZ() + "]"
                     });
                 })
             )
@@ -166,6 +262,22 @@ public class GameLibCommand {
                     section.visualize(player);
                 })
             )
+        )
+        .withSubcommand(new CommandAPICommand("joingame")
+            .withArguments(gameArgument("game"))
+            .withArguments(arenaArgument("arena"))
+            .executes((sender, args) -> {
+                Game game = (Game) args[0];
+                Arena arena = (Arena) args[1];
+                GameManager.joinGame(game, arena);
+                sender.sendMessage(GameLib.getChatPrefix() + "Joining " + game.getName());
+            })
+        )
+        .withSubcommand(new CommandAPICommand("leavegame")
+            .executes((sender, args) -> {
+                sender.sendMessage(GameLib.getChatPrefix() + "Leaving " + GameLib.getCurrentGame().getName());
+                GameManager.leaveGame();
+            })
         )
         .register();
 
@@ -218,10 +330,7 @@ public class GameLibCommand {
     public Argument arenaArgument(String nodeName) {
     
         return new CustomArgument<Arena>(nodeName, (input) -> {
-            GameLib.logDebug(input, GameLib.getPlugin());
             String[] splitInput = input.split("\\.");
-            GameLib.logDebug(splitInput[0], GameLib.getPlugin());
-            GameLib.logDebug(splitInput[1], GameLib.getPlugin());
             Game game = GameLib.getGames().stream().filter((Game g) -> g.getId().equals(splitInput[0])).findFirst().orElse(null);
             Arena arena = game.getArenas().stream().filter((Arena a) -> a.getId().equals(splitInput[1])).findFirst().orElse(null);
         
@@ -302,6 +411,36 @@ public class GameLibCommand {
             return suggestions.toArray(String[]::new);
         });
 
+    }
+
+    public Argument gameFlagArgument(String nodeName) {
+    
+        return new CustomArgument<GameFlag>(nodeName, (input) -> {
+            GameFlag flag = Set.of(GameFlag.values()).stream().filter((GameFlag f) -> f.name().equals(input)).findFirst().orElse(null);
+        
+            if(flag == null) {
+                throw new CustomArgumentException(new MessageBuilder("Unknown GameFlag: ").appendArgInput());
+            } else {
+                return flag;
+            }
+        }).overrideSuggestions(sender -> {
+            return Set.of(GameFlag.values()).stream().map(GameFlag::name).toArray(String[]::new);
+        });
+    }
+
+    public Argument areaFlagArgument(String nodeName) {
+    
+        return new CustomArgument<AreaFlag>(nodeName, (input) -> {
+            AreaFlag flag = Set.of(AreaFlag.values()).stream().filter((AreaFlag f) -> f.name().equals(input)).findFirst().orElse(null);
+        
+            if(flag == null) {
+                throw new CustomArgumentException(new MessageBuilder("Unknown AreaFlag: ").appendArgInput());
+            } else {
+                return flag;
+            }
+        }).overrideSuggestions(sender -> {
+            return Set.of(AreaFlag.values()).stream().map(AreaFlag::name).toArray(String[]::new);
+        });
     }
 
 }

@@ -4,12 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.Location;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 import lombok.Getter;
 import lombok.Setter;
 
-public class TeamSpawnpoint extends Spawnpoint implements ConfigurationSerializable {
+public class TeamSpawnpoint extends Spawnpoint { // We do not need to implement ConfigurationSerializable, because Spawnpoint already implements it
 
     @Getter @Setter private Team team;
 

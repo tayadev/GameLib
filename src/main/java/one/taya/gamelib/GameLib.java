@@ -34,10 +34,11 @@ public class GameLib extends JavaPlugin {
 	@Getter private static String chatPrefix = "[" + ChatColor.DARK_PURPLE + "GameLib" + ChatColor.RESET + "] ";
 
     @Getter @Setter private static Game currentGame;
+    @Getter @Setter private static Arena currentArena;
 
 	@Override
     public void onLoad() {
-		CommandAPI.onLoad(true); //Load with verbose output
+		CommandAPI.onLoad(true); //Load with verbose output TODO: disable this
 		new GameLibCommand();
     }
 

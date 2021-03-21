@@ -67,6 +67,20 @@ public class Arena implements ConfigurationSerializable {
         }
 
         this.world = Bukkit.getWorld(id);
+
+        // Update Locations to reference this world
+        this.areas.forEach((Area a) -> {
+            a.getSections().forEach((Section s) -> {
+                s.getCorner1().setWorld(this.world);
+                s.getCorner2().setWorld(this.world);
+            });
+        });
+        this.spectatorSpawnpoint.getLocation().setWorld(this.world);
+        this.lobbySpawnpoint.getLocation().setWorld(this.world);
+        this.spawnpoints.forEach((Spawnpoint s) -> {
+            s.getLocation().setWorld(this.world);
+        });
+
         saveDefaultWorld();
 
     }
