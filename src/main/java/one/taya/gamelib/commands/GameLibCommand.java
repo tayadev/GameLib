@@ -134,7 +134,7 @@ public class GameLibCommand {
                 .withArguments(gameArgument("game"))
                 .executes((sender, args) -> {
                     Game game = (Game) args[0];
-                    game.getPlugin().getConfig().set("game", game);
+                    game.getPlugin().getConfig().set(game.getId(), game);
                     game.getPlugin().saveConfig();
                     sender.sendMessage(GameLib.getChatPrefix() + "Saved " + game.getName() + ChatColor.RESET + " to the config");
                 })
