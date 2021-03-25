@@ -68,8 +68,8 @@ public class Game implements ConfigurationSerializable {
         map.put("name", name);
         map.put("healthLevel", healthLevel);
         map.put("foodLevel", foodLevel);
-        map.put("gameMode", gameMode);
-        map.put("difficulty", difficulty);
+        map.put("gameMode", gameMode.toString());
+        map.put("difficulty", difficulty.toString());
         map.put("flags", flags.stream().map(Enum::toString).collect(Collectors.toSet()));
         map.put("arenas", arenas.stream().map(Arena::serialize).collect(Collectors.toSet()));
         map.put("plugin", plugin);
@@ -82,8 +82,8 @@ public class Game implements ConfigurationSerializable {
             (String) serialized.get("name"),
             (int) serialized.get("healthLevel"),
             (int) serialized.get("foodLevel"),
-            (GameMode) serialized.get("gameMode"),
-            (Difficulty) serialized.get("difficulty"),
+            GameMode.valueOf((String) serialized.get("gameMode")),
+            Difficulty.valueOf((String) serialized.get("difficulty")),
             Stream.of(serialized.get("flags")).map(String.class::cast).map(f -> GameFlag.valueOf(f)).collect(Collectors.toSet()),
             Stream.of(serialized.get("arenas")).map(Map.class::cast).map(s -> Arena.deserialize(s)).collect(Collectors.toSet()),
             (Plugin) serialized.get("plugin")

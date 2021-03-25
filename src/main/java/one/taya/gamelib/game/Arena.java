@@ -133,7 +133,7 @@ public class Arena implements ConfigurationSerializable {
         map.put("daylightCycle", daylightCycle);
         map.put("time", time);
         map.put("weatherCycle", weatherCycle);
-        map.put("weather", weather);
+        map.put("weather", weather.toString());
         map.put("flags", flags.stream().map(Enum::toString).collect(Collectors.toSet()));
         return map;
     }
@@ -149,7 +149,7 @@ public class Arena implements ConfigurationSerializable {
             (boolean) serialized.get("daylightCycle"),
             (int) serialized.get("time"),
             (boolean) serialized.get("weatherCycle"),
-            (WeatherType) serialized.get("weather"),
+            WeatherType.valueOf((String) serialized.get("weather")),
             Stream.of(serialized.get("flags")).map(String.class::cast).map(f -> AreaFlag.valueOf(f)).collect(Collectors.toSet())
         );
     }

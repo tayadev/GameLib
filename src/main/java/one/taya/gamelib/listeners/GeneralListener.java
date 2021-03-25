@@ -82,5 +82,5 @@ public class GeneralListener implements Listener  {
         if(isFlagActiveForPlayer(AreaFlag.INVENTORY_CHANGE, player, event.getInventory().getLocation())) event.setCancelled(true);
     }
 
-    // HEALTH, FOOD, PVP, PLAYER_COLLISION, BLOCK_DROPS, MOB_SPAWNING
+    // HEALTH, FOOD, PVP, PLAYER_COLLISION, BLOCK_DROPS, MOB_SPAWNING, FRIENDLY FIRE
 }
