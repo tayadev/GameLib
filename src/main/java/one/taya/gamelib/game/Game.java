@@ -29,8 +29,8 @@ public class Game implements ConfigurationSerializable {
 
     @Getter @Setter private GameStatus status;
 
-    @Getter @Setter private int healthLevel;
-    @Getter @Setter private int foodLevel;
+    @Getter @Setter private int health;
+    @Getter @Setter private int food;
     @Getter @Setter private GameMode gameMode;
     @Getter @Setter private Difficulty difficulty;
 
@@ -38,7 +38,7 @@ public class Game implements ConfigurationSerializable {
 
     @Getter private Set<Arena> arenas = new HashSet<Arena>();
 
-    public Game(String id, String name, int healthLevel, int foodLevel, GameMode gameMode, Difficulty difficulty, Set<GameFlag> flags, Set<Arena> arenas, Plugin plugin) {
+    public Game(String id, String name, int health, int food, GameMode gameMode, Difficulty difficulty, Set<GameFlag> flags, Set<Arena> arenas, Plugin plugin) {
         if (!IdUtil.isValid(id)) throw new IllegalArgumentException("Invalid id");
 
         this.id = id;
@@ -46,8 +46,8 @@ public class Game implements ConfigurationSerializable {
 
         this.plugin = plugin;
 
-        this.healthLevel = healthLevel;
-        this.foodLevel = foodLevel;
+        this.health = health;
+        this.food = food;
         this.gameMode = gameMode;
         this.difficulty = difficulty;
 
@@ -66,8 +66,8 @@ public class Game implements ConfigurationSerializable {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("id", id);
         map.put("name", name);
-        map.put("healthLevel", healthLevel);
-        map.put("foodLevel", foodLevel);
+        map.put("health", health);
+        map.put("food", food);
         map.put("gameMode", gameMode.toString());
         map.put("difficulty", difficulty.toString());
         map.put("flags", flags.stream().map(Enum::toString).collect(Collectors.toSet()));
@@ -80,8 +80,8 @@ public class Game implements ConfigurationSerializable {
         return new Game(
             (String) serialized.get("id"),
             (String) serialized.get("name"),
-            (int) serialized.get("healthLevel"),
-            (int) serialized.get("foodLevel"),
+            (int) serialized.get("health"),
+            (int) serialized.get("food"),
             GameMode.valueOf((String) serialized.get("gameMode")),
             Difficulty.valueOf((String) serialized.get("difficulty")),
             Stream.of(serialized.get("flags")).map(String.class::cast).map(f -> GameFlag.valueOf(f)).collect(Collectors.toSet()),

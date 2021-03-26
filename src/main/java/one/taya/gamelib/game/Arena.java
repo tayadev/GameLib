@@ -29,7 +29,6 @@ public class Arena implements ConfigurationSerializable {
 
     // Spawnpoints
     @Getter @Setter private Spawnpoint spectatorSpawnpoint;
-    @Getter @Setter private Spawnpoint lobbySpawnpoint;
     @Getter private Set<Spawnpoint> spawnpoints = new HashSet<Spawnpoint>();
     
     // Settings
@@ -45,7 +44,7 @@ public class Arena implements ConfigurationSerializable {
      * Represents a arena for a Game
      * @param id is used to uniquely identify this arena and to load the world with the same name
      */
-    public Arena(String id, String name, Set<Area> areas, Spawnpoint spectatorSpawnpoint, Spawnpoint lobbySpawnpoint, Set<Spawnpoint> spawnpoints, boolean daylightCycle, int time, boolean weatherCycle, WeatherType weather, Set<AreaFlag> flags) {
+    public Arena(String id, String name, Set<Area> areas, Spawnpoint spectatorSpawnpoint, Set<Spawnpoint> spawnpoints, boolean daylightCycle, int time, boolean weatherCycle, WeatherType weather, Set<AreaFlag> flags) {
 
         if (!IdUtil.isValid(id)) throw new IllegalArgumentException("Invalid id");
         
@@ -53,7 +52,6 @@ public class Arena implements ConfigurationSerializable {
         this.name = name;
         this.areas = areas;
         this.spectatorSpawnpoint = spectatorSpawnpoint;
-        this.lobbySpawnpoint = lobbySpawnpoint;
         this.spawnpoints = spawnpoints;
         this.daylightCycle = daylightCycle;
         this.time = time;
@@ -76,7 +74,6 @@ public class Arena implements ConfigurationSerializable {
             });
         });
         this.spectatorSpawnpoint.getLocation().setWorld(this.world);
-        this.lobbySpawnpoint.getLocation().setWorld(this.world);
         this.spawnpoints.forEach((Spawnpoint s) -> {
             s.getLocation().setWorld(this.world);
         });
@@ -128,7 +125,6 @@ public class Arena implements ConfigurationSerializable {
         map.put("name", name);
         map.put("areas", areas.stream().map(Area::serialize).collect(Collectors.toSet()));
         map.put("spectatorSpawnpoint", spectatorSpawnpoint);
-        map.put("lobbySpawnpoint", lobbySpawnpoint);
         map.put("spawnpoints", spawnpoints.stream().map(Spawnpoint::serialize).collect(Collectors.toSet()));
         map.put("daylightCycle", daylightCycle);
         map.put("time", time);
@@ -144,7 +140,6 @@ public class Arena implements ConfigurationSerializable {
             (String) serialized.get("name"),
             Stream.of(serialized.get("areas")).map(Map.class::cast).map(s -> Area.deserialize(s)).collect(Collectors.toSet()),
             (Spawnpoint) serialized.get("spectatorSpawnpoint"),
-            (Spawnpoint) serialized.get("lobbySpawnpoint"),
             Stream.of(serialized.get("spawnpoints")).map(Map.class::cast).map(s -> Spawnpoint.deserialize(s)).collect(Collectors.toSet()),
             (boolean) serialized.get("daylightCycle"),
             (int) serialized.get("time"),
