@@ -20,7 +20,6 @@ import one.taya.gamelib.enums.AreaFlag;
 import one.taya.gamelib.enums.GameStatus;
 
 public class GeneralListener implements Listener  {
-    //TODO: find a better name
     // Listens to a lot of events to cancel them if needed to enforce settings
 
     boolean skip(String permission, Player player) {

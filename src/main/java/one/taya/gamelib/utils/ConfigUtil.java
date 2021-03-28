@@ -1,9 +1,9 @@
 package one.taya.gamelib.utils;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
@@ -36,7 +36,8 @@ public class ConfigUtil {
 
     // GameLib
     
-    public static Set<Team> loadTeams(Configuration config) {
+    public static Set<Team> loadTeams() {
+        Configuration config = GameLib.getPlugin().getConfig();
         ConfigurationSection section = config.getConfigurationSection("teams");
         return section
             .getKeys(false)
@@ -48,6 +49,27 @@ public class ConfigUtil {
                 return deserializeTeam(sectionConfigurationSection);
             })
             .collect(Collectors.toSet());
+    }
+
+    public static void saveTeams() {
+        Configuration config = GameLib.getPlugin().getConfig();
+
+        // Clear current data
+        if(config.isConfigurationSection("teams")) {
+            config.set("teams", null);
+        } else {
+            config.createSection("teams");
+        }
+        ConfigurationSection section = config.getConfigurationSection("teams");
+
+        for(Team team : GameLib.getTeams()) {
+            ConfigurationSection teamSection = section.createSection(team.getId());
+            teamSection.set("name", team.getName());
+            teamSection.set("chatColor", serializeChatColor(team.getChatColor()));
+            teamSection.set("players", team.getPlayers().stream().map(GamePlayer::getPlayer).map(OfflinePlayer::getName).collect(Collectors.toList()));
+        }
+
+        GameLib.getPlugin().saveConfig();
     }
 
     static Team deserializeTeam(ConfigurationSection configurationSection) {
@@ -62,6 +84,10 @@ public class ConfigUtil {
     static ChatColor deserializeChatColor(Object serialized) {
         String value = (String) serialized;
         return ChatColor.of(value.toUpperCase());
+    }
+
+    static String serializeChatColor(ChatColor color) {
+        return color.getName();
     }
 
     static Set<GamePlayer> deserializeGamePlayers(List<String> names) {
@@ -86,6 +112,71 @@ public class ConfigUtil {
         Set<Arena> arenas = deserializeArenas(section.getConfigurationSection("arenas"));
         
         return new Game(gameId, name, health, food, gameMode, difficulty, flags, arenas, plugin);
+    }
+
+    public static void saveGame(Game game) {
+        Configuration config = game.getPlugin().getConfig();
+   
+        // Clear current data
+        String id = game.getId();
+        if(config.isConfigurationSection(id)) {
+            config.set(id, null);
+        } else {
+            config.createSection(id);
+        }
+        ConfigurationSection configSection = config.getConfigurationSection(id);
+        configSection.set("name", game.getName());
+        configSection.set("health", game.getHealth());
+        configSection.set("food", game.getFood());
+        configSection.set("gamemode", game.getGameMode().toString());
+        configSection.set("difficulty", game.getDifficulty().toString());
+        configSection.set("flags", game.getFlags().stream().map(GameFlag::toString).collect(Collectors.toList()));
+
+        ConfigurationSection arenasSection = configSection.createSection("arenas");
+        for(Arena arena : game.getArenas()) {
+            ConfigurationSection arenaSection = arenasSection.createSection(arena.getId());
+            arenaSection.set("name", game.getName());
+
+            ConfigurationSection areasSection = configSection.createSection("areas");
+            for(Area area : arena.getAreas()) {
+                ConfigurationSection areaSection = areasSection.createSection(area.getId());
+
+                ConfigurationSection sectionsSection = areaSection.createSection("sections");
+                for(Section section : area.getSections()) {
+                    ConfigurationSection sectionSection = sectionsSection.createSection(section.getId());
+                    sectionSection.set("corner1", serializeLocation(section.getCorner1()));
+                    sectionSection.set("corner2", serializeLocation(section.getCorner2()));
+                }
+
+                areaSection.set("settingsEnabled", area.isSettingsEnabled());
+                areaSection.set("priority", area.getPriority());
+                areaSection.set("flags", area.getFlags().stream().map(AreaFlag::toString).collect(Collectors.toList()));
+            }
+
+            arenaSection.set("spectatorSpawnpoint", serializeSpawnpoint(arena.getSpectatorSpawnpoint()));
+            arenaSection.set("spawnpoints", arena.getSpawnpoints().stream().map(ConfigUtil::serializeSpawnpoint).collect(Collectors.toList()));
+            arenaSection.set("daylightCycle", arena.isDaylightCycle());
+            arenaSection.set("time", arena.getTime());
+            arenaSection.set("weatherCycle", arena.isWeatherCycle());
+            arenaSection.set("weather", arena.getWeather().toString());
+            arenaSection.set("flags", arena.getFlags().stream().map(AreaFlag::toString).collect(Collectors.toList()));
+        }
+    }
+
+    static String serializeLocation(Location location) {
+        return location.getX() + " " + location.getY() + " " + location.getZ() + " " + location.getYaw() + " " + location.getPitch();
+    }
+
+    static Object serializeSpawnpoint(Spawnpoint spawnpoint) {
+        if(spawnpoint.getClass() == TeamSpawnpoint.class) {
+            TeamSpawnpoint teamSpawnpoint = (TeamSpawnpoint) spawnpoint;
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("location", serializeLocation(teamSpawnpoint.getLocation()));
+            map.put("team", teamSpawnpoint.getTeam().getId());
+            return map;
+        } else {
+            return serializeLocation(spawnpoint.getLocation());
+        }
     }
 
     static Arena deserializeArena(ConfigurationSection configurationSection) {
@@ -233,7 +324,7 @@ public class ConfigUtil {
 
     static Team deserializeTeamFromId(Object serialized) {
         String teamId = (String) serialized;
-        Team team = GameLib.getTeams().stream().filter((Team t) -> {return t.getId() == teamId;}).findFirst().orElse(null);
+        Team team = GameLib.getTeams().stream().filter((Team t) -> {return t.getId() == teamId;}).findFirst().get(); // FIXME: This doesn't find the team??? or it does and returns null?? idk
         return team;
     }
 

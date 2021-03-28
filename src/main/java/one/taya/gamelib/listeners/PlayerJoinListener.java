@@ -6,6 +6,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 import net.md_5.bungee.api.ChatColor;
+import one.taya.gamelib.enums.GamePlayerType;
+import one.taya.gamelib.game.GamePlayer;
 import one.taya.gamelib.managers.PlayerManager;
 
 public class PlayerJoinListener implements Listener {
@@ -15,10 +17,15 @@ public class PlayerJoinListener implements Listener {
         Player bukkitPlayer = event.getPlayer();
         
         // Create/Get GamePlayer
-        PlayerManager.getGamePlayer(bukkitPlayer).setPlayer(bukkitPlayer);
+        GamePlayer player = PlayerManager.getGamePlayer(bukkitPlayer);
+        player.setPlayer(bukkitPlayer);
+
+        String nameColor = ChatColor.GRAY.toString();
+        if(player.getTeam() != null) nameColor = player.getTeam().getChatColor().toString();
+        if(player.getType() == GamePlayerType.MODERATOR) nameColor = ChatColor.BOLD.toString() + ChatColor.GOLD.toString();
 
         // handle join message
-        event.setJoinMessage(ChatColor.WHITE + "[" + ChatColor.GREEN + "+" +  ChatColor.WHITE + "] " + bukkitPlayer.getDisplayName());
+        event.setJoinMessage(ChatColor.WHITE + "[" + ChatColor.GREEN + "+" +  ChatColor.WHITE + "] " + nameColor + bukkitPlayer.getDisplayName());
 
         //TODO: spawn player in correct world depending on current game
     }

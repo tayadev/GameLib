@@ -26,6 +26,7 @@ import one.taya.gamelib.game.GamePlayer;
 import one.taya.gamelib.game.Section;
 import one.taya.gamelib.game.Team;
 import one.taya.gamelib.managers.GameManager;
+import one.taya.gamelib.utils.ConfigUtil;
 
 public class GameLibCommand {
     
@@ -77,11 +78,11 @@ public class GameLibCommand {
             )
             .withSubcommand(new CommandAPICommand("set")
                 .withSubcommand(new CommandAPICommand("type")
-                    .withArguments(gamePlayerTypeArgument("gamePlayerType"))
                     .withArguments(gamePlayerArgument("player"))
+                    .withArguments(gamePlayerTypeArgument("gamePlayerType"))
                     .executes((sender, args) -> {
-                        GamePlayerType gamePlayerType = (GamePlayerType) args[0];
-                        GamePlayer gamePlayer = (GamePlayer) args[1];
+                        GamePlayer gamePlayer = (GamePlayer) args[0];
+                        GamePlayerType gamePlayerType = (GamePlayerType) args[1];
 
                         gamePlayer.setType(gamePlayerType);
 
@@ -265,11 +266,11 @@ public class GameLibCommand {
             )
         )
         .withSubcommand(new CommandAPICommand("joingame")
-            .withArguments(gameArgument("game"))
             .withArguments(arenaArgument("arena"))
             .executes((sender, args) -> {
-                Game game = (Game) args[0];
-                Arena arena = (Arena) args[1];
+                Arena arena = (Arena) args[0];
+                Game game = GameLib.getGames().stream().filter((Game g) -> {return g.getArenas().contains(arena);}).findFirst().orElse(null);
+
                 GameManager.joinGame(game, arena);
                 sender.sendMessage(GameLib.getChatPrefix() + "Joining " + game.getName());
             })
@@ -295,6 +296,55 @@ public class GameLibCommand {
                         GameLib.getChatPrefix() + ChatColor.GRAY + "ChatColor: " + ChatColor.RESET + team.getChatColor().getName(),
                         GameLib.getChatPrefix() + ChatColor.GRAY + "Players: " + ChatColor.RESET + team.getPlayers().stream().map(GamePlayer::getPlayer).map(OfflinePlayer::getName).collect(Collectors.joining(", "))
                     });
+                })
+            )
+            .withSubcommand(new CommandAPICommand("join")
+                .withArguments(gamePlayerArgument("player"))
+                .withArguments(teamArgument("team"))
+                .executes((sender, args) -> {
+                    GamePlayer gamePlayer = (GamePlayer) args[0];
+                    Team team = (Team) args[1];
+
+                    gamePlayer.setTeam(team);
+                    team.getPlayers().add(gamePlayer);
+                    gamePlayer.setType(GamePlayerType.PLAYER);
+
+                    sender.sendMessage(GameLib.getChatPrefix() + "Added " + ChatColor.AQUA + gamePlayer.getPlayer().getName() + ChatColor.RESET + " to team " + team.getName());
+                })
+            )
+            .withSubcommand(new CommandAPICommand("leave")
+                .withArguments(gamePlayerArgument("player"))
+                .executes((sender, args) -> {
+                    GamePlayer gamePlayer = (GamePlayer) args[0];
+
+                    sender.sendMessage(GameLib.getChatPrefix() + "Removed " + ChatColor.AQUA + gamePlayer.getPlayer().getName() + ChatColor.RESET + " from team " + gamePlayer.getTeam().getName());
+
+                    gamePlayer.getTeam().getPlayers().remove(gamePlayer);
+                    gamePlayer.setTeam(null);
+                    gamePlayer.setType(GamePlayerType.SPECTATOR);
+
+                })
+            )
+        )
+        .withSubcommand(new CommandAPICommand("config")
+            .withSubcommand(new CommandAPICommand("save")
+                .executes((sender, args) -> {
+                    ConfigUtil.saveTeams();
+                    sender.sendMessage(GameLib.getChatPrefix() + "Saved Teams to config");
+                    for(Game game: GameLib.getGames()) {
+                        ConfigUtil.saveGame(game);
+                        sender.sendMessage(GameLib.getChatPrefix() + "Saved " + game.getName() + ChatColor.RESET + " to config");
+                    }
+                })
+            )
+            .withSubcommand(new CommandAPICommand("load")
+                .executes((sender, args) -> {
+                    ConfigUtil.loadTeams();
+                    sender.sendMessage(GameLib.getChatPrefix() + "Loaded Teams from config");
+                    for(Game game: GameLib.getGames()) {
+                        ConfigUtil.loadGame(game.getPlugin().getConfig(), game.getId(), game.getPlugin());
+                        sender.sendMessage(GameLib.getChatPrefix() + "Loaded " + game.getName() + ChatColor.RESET + " from config");
+                    }
                 })
             )
         )

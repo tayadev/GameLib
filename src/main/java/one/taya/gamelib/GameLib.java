@@ -43,7 +43,7 @@ public class GameLib extends JavaPlugin {
 
 	@Override
     public void onLoad() {
-		CommandAPI.onLoad(true); //Load with verbose output TODO: disable this
+		CommandAPI.onLoad(false);
 		new GameLibCommand();
     }
 
@@ -58,7 +58,7 @@ public class GameLib extends JavaPlugin {
         if(!configFile.exists()) {
             saveDefaultConfig();
         }
-        teams = ConfigUtil.loadTeams(getConfig());
+        teams = ConfigUtil.loadTeams();
         for(Team team : teams) {
             for(GamePlayer player : team.getPlayers()) {
                 player.setTeam(team);
