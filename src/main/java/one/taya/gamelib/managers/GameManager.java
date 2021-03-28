@@ -14,7 +14,8 @@ public class GameManager {
         GameLib.setCurrentArena(arena);
         GameLib.getPlayers().forEach((GamePlayer player) -> {
             if(player.getPlayer().isOnline()) {
-                player.getPlayer().getPlayer().teleport(arena.getLobbySpawnpoint().getLocation());
+                // TODO: add actual spawnpoint finding logic
+                player.getPlayer().getPlayer().teleport(arena.getSpawnpoints().stream().findFirst().orElse(null).getLocation());
             }
         });
     }

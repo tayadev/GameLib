@@ -1,13 +1,13 @@
 package one.taya.gamelib.managers;
 
-import org.bukkit.entity.Player;
+import org.bukkit.OfflinePlayer;
 
 import one.taya.gamelib.GameLib;
 import one.taya.gamelib.game.GamePlayer;
 
 public class PlayerManager {
     
-    public static GamePlayer getGamePlayer(Player player) {
+    public static GamePlayer getGamePlayer(OfflinePlayer player) {
 
         GamePlayer gamePlayer = GameLib.getPlayers().stream().filter((GamePlayer p) -> p.getPlayer().getUniqueId().equals(player.getUniqueId())).findFirst().orElse(null);
 

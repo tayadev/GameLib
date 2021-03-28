@@ -1,10 +1,6 @@
 package one.taya.gamelib.game;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.bukkit.Location;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -13,7 +9,7 @@ import one.taya.gamelib.GameLib;
 import one.taya.gamelib.utils.IdUtil;
 import one.taya.gamelib.utils.ParticleUtil;
 
-public class Section implements ConfigurationSerializable {
+public class Section {
    
     @Getter private String id;
     @Getter private Location corner1;
@@ -53,23 +49,6 @@ public class Section implements ConfigurationSerializable {
                 }
             }
         }.runTaskTimer(GameLib.getPlugin(), 0, 10);
-    }
-
-	@Override
-	public Map<String, Object> serialize() {
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("id", id);
-        map.put("corner1", corner1);
-        map.put("corner2", corner2);
-        return map;
-    }
-    
-    public static Section deserialize(Map<String, Object> serialized) {
-        return new Section(
-            (String) serialized.get("id"),
-            (Location) serialized.get("corner1"),
-            (Location) serialized.get("corner2")
-            );
     }
 
 }

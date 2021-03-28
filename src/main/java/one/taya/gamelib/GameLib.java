@@ -1,5 +1,6 @@
 package one.taya.gamelib;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,13 +13,16 @@ import lombok.Getter;
 import lombok.Setter;
 import net.md_5.bungee.api.ChatColor;
 import one.taya.gamelib.commands.GameLibCommand;
+import one.taya.gamelib.enums.GamePlayerType;
 import one.taya.gamelib.game.Arena;
 import one.taya.gamelib.game.Game;
 import one.taya.gamelib.game.GamePlayer;
+import one.taya.gamelib.game.Team;
 import one.taya.gamelib.listeners.PlayerJoinListener;
 import one.taya.gamelib.listeners.PlayerQuitListener;
 import one.taya.gamelib.managers.GameManager;
 import one.taya.gamelib.managers.PlayerManager;
+import one.taya.gamelib.utils.ConfigUtil;
 
 public class GameLib extends JavaPlugin {
 
@@ -29,6 +33,7 @@ public class GameLib extends JavaPlugin {
 	@Getter private static PlayerManager playerManager;
 
 	@Getter private static Set<Game> games = new HashSet<Game>();
+    @Getter private static Set<Team> teams = new HashSet<Team>();
 	@Getter private static Set<GamePlayer> players = new HashSet<GamePlayer>();
 	
 	@Getter private static String chatPrefix = "[" + ChatColor.DARK_PURPLE + "GameLib" + ChatColor.RESET + "] ";
@@ -48,8 +53,21 @@ public class GameLib extends JavaPlugin {
 
 		CommandAPI.onEnable(this);
 
-		// Debug mode TODO: load from config
-		debug = true;
+        // Config
+        File configFile = new File(this.getDataFolder(), "config.yml");
+        if(!configFile.exists()) {
+            saveDefaultConfig();
+        }
+        teams = ConfigUtil.loadTeams(getConfig());
+        for(Team team : teams) {
+            for(GamePlayer player : team.getPlayers()) {
+                player.setTeam(team);
+                player.setType(GamePlayerType.PLAYER);
+            }
+        }
+
+        // Debug Mode
+		debug = getConfig().getBoolean("debug", false);
         if(debug) logInfo(ChatColor.YELLOW + "Debug logging enabled");
 
 		// Register Listeners

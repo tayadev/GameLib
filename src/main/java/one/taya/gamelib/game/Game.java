@@ -1,15 +1,10 @@
 package one.taya.gamelib.game;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.plugin.Plugin;
 
 import lombok.Getter;
@@ -19,7 +14,7 @@ import one.taya.gamelib.enums.GameFlag;
 import one.taya.gamelib.enums.GameStatus;
 import one.taya.gamelib.utils.IdUtil;
 
-public class Game implements ConfigurationSerializable {
+public class Game {
 
     @Getter private String id;
     @Getter @Setter private String name;
@@ -59,35 +54,6 @@ public class Game implements ConfigurationSerializable {
 
         // Register game
         GameLib.addGame(this);
-    }
-
-    @Override
-    public Map<String, Object> serialize() {
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("id", id);
-        map.put("name", name);
-        map.put("health", health);
-        map.put("food", food);
-        map.put("gameMode", gameMode.toString());
-        map.put("difficulty", difficulty.toString());
-        map.put("flags", flags.stream().map(Enum::toString).collect(Collectors.toSet()));
-        map.put("arenas", arenas.stream().map(Arena::serialize).collect(Collectors.toSet()));
-        map.put("plugin", plugin);
-        return map;
-    }
-
-    public static Game deserialize(Map<String, Object> serialized) {
-        return new Game(
-            (String) serialized.get("id"),
-            (String) serialized.get("name"),
-            (int) serialized.get("health"),
-            (int) serialized.get("food"),
-            GameMode.valueOf((String) serialized.get("gameMode")),
-            Difficulty.valueOf((String) serialized.get("difficulty")),
-            Stream.of(serialized.get("flags")).map(String.class::cast).map(f -> GameFlag.valueOf(f)).collect(Collectors.toSet()),
-            Stream.of(serialized.get("arenas")).map(Map.class::cast).map(s -> Arena.deserialize(s)).collect(Collectors.toSet()),
-            (Plugin) serialized.get("plugin")
-        );
     }
 
 }

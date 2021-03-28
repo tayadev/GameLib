@@ -1,53 +1,104 @@
 package one.taya.gamelib.utils;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.WeatherType;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.plugin.Plugin;
 
+import net.md_5.bungee.api.ChatColor;
+import one.taya.gamelib.GameLib;
 import one.taya.gamelib.enums.AreaFlag;
 import one.taya.gamelib.enums.GameFlag;
 import one.taya.gamelib.game.Area;
 import one.taya.gamelib.game.Arena;
 import one.taya.gamelib.game.Game;
+import one.taya.gamelib.game.GamePlayer;
 import one.taya.gamelib.game.Section;
 import one.taya.gamelib.game.Spawnpoint;
+import one.taya.gamelib.game.Team;
+import one.taya.gamelib.game.TeamSpawnpoint;
+import one.taya.gamelib.managers.PlayerManager;
 
-// TODO: spawnpoints, plugin | test it! | saving to config
+// TODO: saving to config
 
 public class ConfigUtil {
-    public Game loadGame(Configuration config, String gameId) {
 
+    // GameLib
+    
+    public static Set<Team> loadTeams(Configuration config) {
+        ConfigurationSection section = config.getConfigurationSection("teams");
+        return section
+            .getKeys(false)
+            .stream()
+            .map((String key) -> {
+                return section.getConfigurationSection(key);
+            })
+            .map((ConfigurationSection sectionConfigurationSection) -> {
+                return deserializeTeam(sectionConfigurationSection);
+            })
+            .collect(Collectors.toSet());
+    }
+
+    static Team deserializeTeam(ConfigurationSection configurationSection) {
+        String id = configurationSection.getName();
+        String name = deserializeName(configurationSection.get("name"));
+        ChatColor chatColor = deserializeChatColor(configurationSection.get("chatColor"));
+        Set<GamePlayer> players = deserializeGamePlayers(configurationSection.getStringList("players"));
+
+        return new Team(id, name, chatColor, players);
+    }
+
+    static ChatColor deserializeChatColor(Object serialized) {
+        String value = (String) serialized;
+        return ChatColor.of(value.toUpperCase());
+    }
+
+    static Set<GamePlayer> deserializeGamePlayers(List<String> names) {
+        return names.stream().map(ConfigUtil::deserializeGamePlayer).collect(Collectors.toSet());
+    }
+
+    static GamePlayer deserializeGamePlayer(String name) {
+        OfflinePlayer player = Bukkit.getOfflinePlayer(name);
+        return PlayerManager.getGamePlayer(player);
+    }
+
+    // Game
+
+    public static Game loadGame(Configuration config, String gameId, Plugin plugin) {
         ConfigurationSection section = config.getConfigurationSection(gameId);
-        String name = (String) section.get("name");
+        String name = deserializeName(section.get("name"));
         int health = (int) section.get("health");
         int food = (int) section.get("food");
-        GameMode gameMode = deserializeGameMode(config.get("gamemode"));
-        Difficulty difficulty = deserializeDifficulty(config.get("difficulty"));
-        Set<GameFlag> flags = deserializeGameFlags(config.get("flags"));
-        Set<Arena> arenas = deserializeArenas(config.getConfigurationSection("arenas"));
+        GameMode gameMode = deserializeGameMode(section.get("gamemode"));
+        Difficulty difficulty = deserializeDifficulty(section.get("difficulty"));
+        Set<GameFlag> flags = deserializeGameFlags(section.getStringList("flags"));
+        Set<Arena> arenas = deserializeArenas(section.getConfigurationSection("arenas"));
         
         return new Game(gameId, name, health, food, gameMode, difficulty, flags, arenas, plugin);
     }
 
     static Arena deserializeArena(ConfigurationSection configurationSection) {
         String id = configurationSection.getName();
-        String name = (String) configurationSection.get("name");
+        String name = deserializeName(configurationSection.get("name"));
         Set<Area> areas = deserializeAreas(configurationSection.getConfigurationSection("areas"), id);
         Spawnpoint spectatorSpawnpoint = new Spawnpoint(deserializeLocation(configurationSection.get("spectatorSpawnpoint"), id));
-        Set<Spawnpoint> spawnpoints = deserializeSpawnpoints(configurationSection.getConfigurationSection("spawnpoints"), id);
+        Set<Spawnpoint> spawnpoints = deserializeSpawnpoints(configurationSection.getList("spawnpoints"), id);
         Boolean daylightCycle = (Boolean) configurationSection.get("daylightCycle");
         int time = (int) configurationSection.get("time");
         Boolean weatherCycle = (Boolean) configurationSection.get("weatherCycle");
         WeatherType weather = deserializeWeather(configurationSection.get("weather"));
-        Set<AreaFlag> flags = deserializeAreaFlags(configurationSection.get("flags"));
+        Set<AreaFlag> flags = deserializeAreaFlags(configurationSection.getStringList("flags"));
 
         return new Arena(id, name, areas, spectatorSpawnpoint, spawnpoints, daylightCycle, time,
                 weatherCycle, weather, flags);
@@ -59,7 +110,7 @@ public class ConfigUtil {
         Set<Section> sections = deserializeSections(configurationSection.getConfigurationSection("sections"), worldId);
         Boolean settingsEnabled = (Boolean) configurationSection.get("settingsEnabled");
         int priority = (int) configurationSection.get("priority");
-        Set<AreaFlag> flags = deserializeAreaFlags(configurationSection.get("flags"));
+        Set<AreaFlag> flags = deserializeAreaFlags(configurationSection.getStringList("flags"));
 
         return new Area(id, sections, settingsEnabled, priority, flags);
     }
@@ -85,20 +136,20 @@ public class ConfigUtil {
         return new Location(Bukkit.getWorld(worldId), x, y, z, yaw, pitch);
     }
 
-    static GameFlag deserializeGameFlag(Object serialized) {
-        return GameFlag.valueOf((String) serialized);
+    static GameFlag deserializeGameFlag(String value) {
+        return GameFlag.valueOf(value.toUpperCase());
     }
 
-    static Set<GameFlag> deserializeGameFlags(Object serialized) {
-        return Stream.of(serialized).map(ConfigUtil::deserializeGameFlag).collect(Collectors.toSet());
+    static Set<GameFlag> deserializeGameFlags(List<String> serialized) {
+        return serialized.stream().map(ConfigUtil::deserializeGameFlag).collect(Collectors.toSet());
     }
 
-    static AreaFlag deserializeAreaFlag(Object serialized) {
-        return AreaFlag.valueOf((String) serialized);
+    static AreaFlag deserializeAreaFlag(String value) {
+        return AreaFlag.valueOf(value.toUpperCase());
     }
 
-    static Set<AreaFlag> deserializeAreaFlags(Object serialized) {
-        return Stream.of(serialized).map(ConfigUtil::deserializeAreaFlag).collect(Collectors.toSet());
+    static Set<AreaFlag> deserializeAreaFlags(List<String> serialized) {
+        return serialized.stream().map(ConfigUtil::deserializeAreaFlag).collect(Collectors.toSet());
     }
 
     static Set<Section> deserializeSections(ConfigurationSection configurationSection, String worldId) {
@@ -141,15 +192,54 @@ public class ConfigUtil {
     }
 
     static WeatherType deserializeWeather(Object serialized) {
-        return WeatherType.valueOf((String) serialized);
+        String value = (String) serialized;
+        return WeatherType.valueOf(value.toUpperCase());
     }
 
     static GameMode deserializeGameMode(Object serialized) {
-        return GameMode.valueOf((String) serialized);
+        String value = (String) serialized;
+        return GameMode.valueOf(value.toUpperCase());
     }
 
     static Difficulty deserializeDifficulty(Object serialized) {
-        return Difficulty.valueOf((String) serialized);
+        String value = (String) serialized;
+        return Difficulty.valueOf(value.toUpperCase());
+    }
+
+    static Set<Spawnpoint> deserializeSpawnpoints(List<?> spawnpoints, String worldId) {
+        return spawnpoints
+            .stream()
+            .map((Object spawnpoint) -> {
+                return deserializeSpawnpoint(spawnpoint, worldId);
+            })
+            .collect(Collectors.toSet());
+    }
+
+    static Spawnpoint deserializeSpawnpoint(Object serialized, String worldId) {
+        Spawnpoint spawnpoint;
+
+        if(serialized.getClass() != String.class) {
+            Map<String, Object> map = (Map<String, Object>) serialized;
+            Location location = deserializeLocation(map.get("location"), worldId);
+            Team team = deserializeTeamFromId(map.get("team"));
+            spawnpoint = new TeamSpawnpoint(location, team);
+        } else {
+            Location location = deserializeLocation(serialized, worldId);
+            spawnpoint = new Spawnpoint(location);
+        }
+
+        return spawnpoint;
+    }
+
+    static Team deserializeTeamFromId(Object serialized) {
+        String teamId = (String) serialized;
+        Team team = GameLib.getTeams().stream().filter((Team t) -> {return t.getId() == teamId;}).findFirst().orElse(null);
+        return team;
+    }
+
+    static String deserializeName(Object serialized) {
+        String value = (String) serialized;
+        return ChatColor.translateAlternateColorCodes('&', value);
     }
 
 }

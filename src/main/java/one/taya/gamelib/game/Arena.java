@@ -1,18 +1,14 @@
 package one.taya.gamelib.game;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.WeatherType;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -20,7 +16,7 @@ import one.taya.gamelib.enums.AreaFlag;
 import one.taya.gamelib.utils.IdUtil;
 import one.taya.gamelib.utils.LocationUtil;
 
-public class Arena implements ConfigurationSerializable {
+public class Arena {
     
     @Getter private String id;
     @Getter @Setter private String name;
@@ -116,37 +112,6 @@ public class Arena implements ConfigurationSerializable {
         } else {
             return new HashSet<AreaFlag>();
         }
-    }
-
-    @Override
-    public Map<String, Object> serialize() {
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("id", id);
-        map.put("name", name);
-        map.put("areas", areas.stream().map(Area::serialize).collect(Collectors.toSet()));
-        map.put("spectatorSpawnpoint", spectatorSpawnpoint);
-        map.put("spawnpoints", spawnpoints.stream().map(Spawnpoint::serialize).collect(Collectors.toSet()));
-        map.put("daylightCycle", daylightCycle);
-        map.put("time", time);
-        map.put("weatherCycle", weatherCycle);
-        map.put("weather", weather.toString());
-        map.put("flags", flags.stream().map(Enum::toString).collect(Collectors.toSet()));
-        return map;
-    }
-
-    public static Arena deserialize(Map<String, Object> serialized) {
-        return new Arena(
-            (String) serialized.get("id"),
-            (String) serialized.get("name"),
-            Stream.of(serialized.get("areas")).map(Map.class::cast).map(s -> Area.deserialize(s)).collect(Collectors.toSet()),
-            (Spawnpoint) serialized.get("spectatorSpawnpoint"),
-            Stream.of(serialized.get("spawnpoints")).map(Map.class::cast).map(s -> Spawnpoint.deserialize(s)).collect(Collectors.toSet()),
-            (boolean) serialized.get("daylightCycle"),
-            (int) serialized.get("time"),
-            (boolean) serialized.get("weatherCycle"),
-            WeatherType.valueOf((String) serialized.get("weather")),
-            Stream.of(serialized.get("flags")).map(String.class::cast).map(f -> AreaFlag.valueOf(f)).collect(Collectors.toSet())
-        );
     }
 
 }

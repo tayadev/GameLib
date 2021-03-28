@@ -24,6 +24,7 @@ import one.taya.gamelib.game.Arena;
 import one.taya.gamelib.game.Game;
 import one.taya.gamelib.game.GamePlayer;
 import one.taya.gamelib.game.Section;
+import one.taya.gamelib.game.Team;
 import one.taya.gamelib.managers.GameManager;
 
 public class GameLibCommand {
@@ -279,6 +280,24 @@ public class GameLibCommand {
                 GameManager.leaveGame();
             })
         )
+        .withSubcommand(new CommandAPICommand("teams")
+            .withSubcommand(new CommandAPICommand("list")
+                .executes((sender, args) -> {
+                    sender.sendMessage(GameLib.getChatPrefix() + "Teams: " + GameLib.getTeams().stream().map(Team::getId).collect(Collectors.joining(", ")));
+                })
+            )
+            .withSubcommand(new CommandAPICommand("get")
+                .withArguments(teamArgument("team"))
+                .executes((sender, args) -> {
+                    Team team = (Team) args[0];
+                    sender.sendMessage(new String[] {
+                        GameLib.getChatPrefix() + ChatColor.GRAY + "Info for team: " + ChatColor.RESET + team.getName(),
+                        GameLib.getChatPrefix() + ChatColor.GRAY + "ChatColor: " + ChatColor.RESET + team.getChatColor().getName(),
+                        GameLib.getChatPrefix() + ChatColor.GRAY + "Players: " + ChatColor.RESET + team.getPlayers().stream().map(GamePlayer::getPlayer).map(OfflinePlayer::getName).collect(Collectors.joining(", "))
+                    });
+                })
+            )
+        )
         .register();
 
     }
@@ -440,6 +459,21 @@ public class GameLibCommand {
             }
         }).overrideSuggestions(sender -> {
             return Set.of(AreaFlag.values()).stream().map(AreaFlag::name).toArray(String[]::new);
+        });
+    }
+
+     public Argument teamArgument(String nodeName) {
+    
+        return new CustomArgument<Team>(nodeName, (input) -> {
+            Team team = GameLib.getTeams().stream().filter((Team t) -> t.getId().equals(input)).findFirst().orElse(null);
+        
+            if(team == null) {
+                throw new CustomArgumentException(new MessageBuilder("Unknown Team: ").appendArgInput());
+            } else {
+                return team;
+            }
+        }).overrideSuggestions(sender -> {
+            return GameLib.getTeams().stream().map(Team::getId).toArray(String[]::new);
         });
     }
 
