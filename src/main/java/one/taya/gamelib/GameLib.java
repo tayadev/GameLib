@@ -18,7 +18,9 @@ import one.taya.gamelib.game.Arena;
 import one.taya.gamelib.game.Game;
 import one.taya.gamelib.game.GamePlayer;
 import one.taya.gamelib.game.Team;
+import one.taya.gamelib.listeners.GeneralListener;
 import one.taya.gamelib.listeners.PlayerJoinListener;
+import one.taya.gamelib.listeners.PlayerMovementListener;
 import one.taya.gamelib.listeners.PlayerQuitListener;
 import one.taya.gamelib.managers.GameManager;
 import one.taya.gamelib.managers.PlayerManager;
@@ -73,6 +75,8 @@ public class GameLib extends JavaPlugin {
 		// Register Listeners
 		Bukkit.getPluginManager().registerEvents(new PlayerJoinListener(), this);
 		Bukkit.getPluginManager().registerEvents(new PlayerQuitListener(), this);
+		Bukkit.getPluginManager().registerEvents(new PlayerMovementListener(), this);
+		Bukkit.getPluginManager().registerEvents(new GeneralListener(), this);
 
 		getLogger().info(ChatColor.BLUE + "Enabled GameLib by Taya");
 	}

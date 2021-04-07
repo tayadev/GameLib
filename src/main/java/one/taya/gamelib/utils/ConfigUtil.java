@@ -324,7 +324,9 @@ public class ConfigUtil {
 
     static Team deserializeTeamFromId(Object serialized) {
         String teamId = (String) serialized;
-        Team team = GameLib.getTeams().stream().filter((Team t) -> {return t.getId() == teamId;}).findFirst().get(); // FIXME: This doesn't find the team??? or it does and returns null?? idk
+        Team team = GameLib.getTeams().stream().filter((Team t) -> {
+            return t.getId().equals(teamId);
+        }).findAny().get();
         return team;
     }
 

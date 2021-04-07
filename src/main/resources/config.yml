@@ -1,12 +1,15 @@
 debug: true
-
-teams:
-    red:
-        name: "&4Red Reindeers"
-        chatColor: RED
-        players:
-            - TayaMc
-
 scores:
-    steve: 123
-    alex: 432
+  steve: 123
+  alex: 432
+teams:
+  red:
+    name: §4Red Reindeers
+    chatColor: red
+    players:
+    - ArsonElu
+  purple:
+    name: §5Purple Pandas
+    chatColor: dark_purple
+    players:
+    - TayaMc

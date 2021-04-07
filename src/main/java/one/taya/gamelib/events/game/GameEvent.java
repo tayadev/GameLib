@@ -9,7 +9,7 @@ import one.taya.gamelib.game.Game;
 
 public class GameEvent extends Event {
 
-    @Getter private final HandlerList handlers = new HandlerList();
+    private static final HandlerList handlers = new HandlerList();
     @Getter @Setter private boolean isCancelled;
 
     @Getter private Game game;
@@ -17,6 +17,15 @@ public class GameEvent extends Event {
     public GameEvent(Game game) {
         this.isCancelled = false;
         this.game = game;
+    }
+
+    @Override
+    public HandlerList getHandlers() {
+        return handlers;
+    }
+
+    public static HandlerList getHandlerList() {
+        return handlers;
     }
 
 }
