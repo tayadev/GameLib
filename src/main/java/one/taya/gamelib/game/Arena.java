@@ -1,6 +1,9 @@
 package one.taya.gamelib.game;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -13,6 +16,7 @@ import org.bukkit.WorldCreator;
 import lombok.Getter;
 import lombok.Setter;
 import one.taya.gamelib.enums.AreaFlag;
+import one.taya.gamelib.utils.AreaFlagUtil;
 import one.taya.gamelib.utils.IdUtil;
 import one.taya.gamelib.utils.LocationUtil;
 
@@ -102,16 +106,32 @@ public class Arena {
      * @return set of areaflags
      */
     public Set<AreaFlag> getFlagsForLocation(Location location) {
-        Area topArea = getAreasForLocation(location)
-            .stream()
-            .filter((Area area) -> area.isSettingsEnabled())
-            .sorted((Area a1, Area a2) -> a1.getPriority() - a2.getPriority()) // TODO: test if this is the right way around
-            .findFirst().orElse(null);
-        if(topArea != null) {
-            return topArea.getFlags();
-        } else {
-            return new HashSet<AreaFlag>();
+        
+        LinkedHashSet<Area> sortedAreas = new LinkedHashSet<Area>(
+            getAreasForLocation(location)
+                .stream()
+                .sorted((Area a1, Area a2) -> a1.getPriority() - a2.getPriority())
+                .collect(Collectors.toList())
+        );
+         
+        // The areas should now be sorted least to most important
+        List<Set<AreaFlag>> listOfFlagSets = new ArrayList<Set<AreaFlag>>();
+        listOfFlagSets.add(getFlags());
+        for(Area area : sortedAreas) {
+            if(area.isSettingsEnabled()) {
+                listOfFlagSets.add(area.getFlags());
+            }
         }
+        
+        Set<AreaFlag> flags = new HashSet<AreaFlag>();
+        for(Set<AreaFlag> flagSet : listOfFlagSets) {
+            for(AreaFlag flag : flagSet) {
+                flags.add(flag);
+                flags.remove(AreaFlagUtil.getInverseAreaFlag(flag));
+            }
+        }
+
+        return flags;
     }
 
 }

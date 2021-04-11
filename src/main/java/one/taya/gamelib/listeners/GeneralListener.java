@@ -23,7 +23,8 @@ public class GeneralListener implements Listener  {
     // Listens to a lot of events to cancel them if needed to enforce settings
 
     boolean skip(String permission, Player player) {
-        return GameLib.getCurrentGame().getStatus() != GameStatus.INGAME || player.hasPermission("gamelib.bypass." + permission);
+        // TODO: uncomment this
+        return /*GameLib.getCurrentGame().getStatus() != GameStatus.INGAME ||*/ player.hasPermission("gamelib.bypass." + permission);
     }
 
     boolean isFlagActiveForPlayer(AreaFlag flag, Player player, Location location) {
@@ -40,14 +41,14 @@ public class GeneralListener implements Listener  {
     public void onBlockPlace(BlockPlaceEvent event) {
         Player player = event.getPlayer();
         if(skip("building", player)) return;
-        if(isFlagActiveForPlayer(AreaFlag.BUILDING, player, event.getBlock().getLocation())) event.setCancelled(true);
+        if(isFlagActiveForPlayer(AreaFlag.BUILDING, player, event.getBlock().getLocation().add(.5, .5, .5))) event.setCancelled(true);
     }
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
         if(skip("breaking", player)) return;
-        if(isFlagActiveForPlayer(AreaFlag.BREAKING, player, event.getBlock().getLocation())) event.setCancelled(true);
+        if(isFlagActiveForPlayer(AreaFlag.BREAKING, player, event.getBlock().getLocation().add(.5, .5, .5))) event.setCancelled(true);
     }
 
     @EventHandler

@@ -5,12 +5,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 import dev.jorel.commandapi.CommandAPICommand;
 import dev.jorel.commandapi.arguments.Argument;
 import dev.jorel.commandapi.arguments.CustomArgument;
+import dev.jorel.commandapi.arguments.LocationArgument;
 import dev.jorel.commandapi.arguments.CustomArgument.CustomArgumentException;
 import dev.jorel.commandapi.arguments.CustomArgument.MessageBuilder;
 import dev.jorel.commandapi.arguments.MultiLiteralArgument;
@@ -145,9 +147,19 @@ public class GameLibCommand {
                 .withArguments(gameArgument("game"))
                 .executes((sender, args) -> {
                     Game game = (Game) args[0];
-                    Game loadedGame = (Game) game.getPlugin().getConfig().get("game");
+                    Game loadedGame = ConfigUtil.loadGame(game.getPlugin().getConfig(), game.getId(), game.getPlugin());
                     game = loadedGame;
                     sender.sendMessage(GameLib.getChatPrefix() + "Loaded " + game.getName()  + ChatColor.RESET + " from the config");
+                })
+            )
+            .withSubcommand(new CommandAPICommand("reset")
+                .withArguments(gameArgument("game"))
+                .executes((sender, args) -> {
+                    Game game = (Game) args[0];
+                    game.getPlugin().saveDefaultConfig();
+                    Game loadedGame = (Game) game.getPlugin().getConfig().get("game");
+                    game = loadedGame;
+                    sender.sendMessage(GameLib.getChatPrefix() + "Reset and reloaded config for " + game.getName());
                 })
             )
         )
@@ -192,6 +204,19 @@ public class GameLibCommand {
                         })
                     )
                 )
+            )
+            .withSubcommand(new CommandAPICommand("queryflags")
+                .withArguments(arenaArgument("arena"))
+                .withArguments(new LocationArgument("location"))
+                .executes((sender, args) -> {
+                    Arena arena = (Arena) args[0];
+                    Location location = (Location) args[1];
+                    Set<AreaFlag> flags = arena.getFlagsForLocation(location);
+                    sender.sendMessage(new String[] {
+                        GameLib.getChatPrefix() + ChatColor.GRAY + "Flags for arena " + ChatColor.RESET + arena.getName() + ChatColor.RESET + " at " + ChatColor.AQUA + location.getX() + " " + location.getY() + " " + location.getZ(),
+                        GameLib.getChatPrefix() + ChatColor.RESET + flags.stream().map(AreaFlag::name).collect(Collectors.joining(", "))
+                    });
+                })
             )
         )
         .withSubcommand(new CommandAPICommand("areas")
@@ -342,7 +367,7 @@ public class GameLibCommand {
                     ConfigUtil.loadTeams();
                     sender.sendMessage(GameLib.getChatPrefix() + "Loaded Teams from config");
                     for(Game game: GameLib.getGames()) {
-                        ConfigUtil.loadGame(game.getPlugin().getConfig(), game.getId(), game.getPlugin());
+                        game = ConfigUtil.loadGame(game.getPlugin().getConfig(), game.getId(), game.getPlugin());
                         sender.sendMessage(GameLib.getChatPrefix() + "Loaded " + game.getName() + ChatColor.RESET + " from config");
                     }
                 })
